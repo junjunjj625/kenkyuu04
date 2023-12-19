@@ -12,6 +12,12 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  late GoogleMapController mapController;
+
+  final CameraPosition initialCameraPosition = const CameraPosition(
+    target: LatLng(35.681236, 139.767125), // 東京駅
+    zoom: 16.0,
+  );
 
   @override
   void initState() {
@@ -24,20 +30,45 @@ class _MapScreenState extends State<MapScreen> {
     });
     super.initState();
   }
-  final CameraPosition initialCameraPosition = const CameraPosition(
-      target: LatLng(35.681236, 139.767125), // 東京駅
-      zoom: 16.0,
-  );
+
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Map'),
+      ),
       body: GoogleMap(
         initialCameraPosition: initialCameraPosition,
+        onMapCreated: (GoogleMapController controller) {
+          mapController = controller;
+        },
+        myLocationEnabled: true,
+        myLocationButtonEnabled: false,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        tooltip: 'Increment',
+        onPressed: () async {
+          // 現在地を取得
+          final Position position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high,
+          );
+
+          // 現在地を中心にカメラを移動
+          mapController.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: LatLng(position.latitude, position.longitude),
+                zoom: 16.0,
+              ),
+            ),
+          );
+        },
+        tooltip: 'current position',
         child: const Icon(Icons.add),
       ),
     );
