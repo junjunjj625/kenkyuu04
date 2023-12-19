@@ -13,6 +13,7 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late GoogleMapController mapController;
+  Set<Marker> markers = {};
 
   final CameraPosition initialCameraPosition = CameraPosition(
     target: LatLng(35.681236, 139.767125),
@@ -35,8 +36,8 @@ class _MapScreenState extends State<MapScreen> {
           await _requestPermission();
           await _moveToCurrentLocation();
         },
-        myLocationEnabled: true,
         myLocationButtonEnabled: false,
+        markers: markers,
       ),
     );
   }
@@ -58,8 +59,19 @@ class _MapScreenState extends State<MapScreen> {
         desiredAccuracy: LocationAccuracy.high,
       );
 
+      setState(() {
+        markers.add(Marker(
+            markerId: const MarkerId("current_location"),
+            position: LatLng(
+              position.latitude,
+              position.longitude,
+            ),
+          ),
+        );
+      });
+
       // 現在地にカメラを移動
-      await mapController.animateCamera(
+      mapController.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(position.latitude, position.longitude),
