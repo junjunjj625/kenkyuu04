@@ -1,6 +1,9 @@
 import 'package:kenkyuu04/components/auth_modal/components/close_modal_button.dart';
 import 'package:flutter/material.dart';
 
+import 'components/registration.dart';
+import 'components/search.dart';
+
 enum AuthModalType {
   search,
   registration;
@@ -26,8 +29,10 @@ class _AuthModalState extends State<AuthModal> {
         children: [
           const CloseModalButton(),
           modalType == AuthModalType.search
-              ? const Text('検索')
-              : const Text('登録'),
+              //? const Text('検索')
+              //: const Text('登録'),
+              ? const search()
+              : const registtration(),
           TextButton(
             onPressed: switchModalType,
             child: Text(buttonLabel),
