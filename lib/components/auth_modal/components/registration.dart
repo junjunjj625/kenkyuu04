@@ -49,7 +49,7 @@ class _registtrationState extends State<registtration> {
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text(
-            'Sign Up',
+            '新規登録',
             style: TextStyle(
               fontSize: 24.0,
               fontWeight: FontWeight.bold,
@@ -59,14 +59,14 @@ class _registtrationState extends State<registtration> {
           AuthTextFormField(
             controller: _latitudeController,
             validator: validateEmail,
-            labelText: 'Email',
+            labelText: '緯度',
           ),
           const SizedBox(height: 16.0),
           AuthTextFormField(
             controller: _longitudeController,
             obscureText: true,
             validator: validatePassword,
-            labelText: 'Password',
+            labelText: '経度',
           ),
           const SizedBox(height: 16.0),
           SubmitButton(

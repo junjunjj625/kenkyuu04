@@ -22,9 +22,12 @@ class _AuthModalState extends State<AuthModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+        onTap: () => unFocus(context),
+    child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       height: MediaQuery.of(context).size.height * 0.9,
+    child: SingleChildScrollView(
       child: Column(
         children: [
           const CloseModalButton(),
@@ -37,11 +40,20 @@ class _AuthModalState extends State<AuthModal> {
             onPressed: switchModalType,
             child: Text(buttonLabel),
           ),
+          const SizedBox(height: 300)
         ],
       ),
+    ),
+    ),
     );
   }
 
+  void unFocus(BuildContext context) {
+    final FocusScopeNode currentScope = FocusScope.of(context);
+    if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
+      FocusManager.instance.primaryFocus!.unfocus();
+    }
+  }
   void switchModalType() {
     setState(() {
       modalType = modalType == AuthModalType.search
