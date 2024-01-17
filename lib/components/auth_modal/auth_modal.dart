@@ -18,7 +18,7 @@ class AuthModal extends StatefulWidget {
 
 class _AuthModalState extends State<AuthModal> {
   AuthModalType modalType = AuthModalType.search;
-  String buttonLabel = '登録へ';
+  String buttonLabel = '検索へ';
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +34,8 @@ class _AuthModalState extends State<AuthModal> {
           modalType == AuthModalType.search
               //? const Text('検索')
               //: const Text('登録'),
-              ? const search()
-              : const registtration(),
+              ? const RegisttrationForm()
+              : const search(),
           TextButton(
             onPressed: switchModalType,
             child: Text(buttonLabel),
@@ -60,7 +60,7 @@ class _AuthModalState extends State<AuthModal> {
           ? AuthModalType.registration
           : AuthModalType.search;
 
-      buttonLabel = modalType == AuthModalType.search ? '登録へ' : '検索へ';
+      buttonLabel = modalType == AuthModalType.search ? '検索へ' : '登録へ';
     });
   }
 }

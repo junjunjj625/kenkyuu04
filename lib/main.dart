@@ -23,8 +23,8 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        //home: const MapScreen(),
-        home: const MainScreen(),
+        home: const MapScreen(),
+        //home: const MainScreen(),
     );
   }
 }
@@ -48,7 +48,19 @@ class _MainScreenState extends State<MainScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text(datas.toString()),
+            //Text(datas.toString()),
+            StreamBuilder<QuerySnapshot>(
+              stream: getStream(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot,) {
+                if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+                  return const Text('empty');
+                }
+                final datas = snapshot.data!.docs.map((doc) => doc.data());
+
+                return Text(datas.toString());
+              },
+            ),
             ElevatedButton(
               onPressed: onPressed,
               child: const Text('push'),
@@ -59,9 +71,24 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  Stream<QuerySnapshot> getStream() {
+    final db = FirebaseFirestore.instance;
+    final collectionRef = db.collection('App_Data');
+    // コレクションのストリームを返す
+    return collectionRef.snapshots();
+  }
+
   Future<void> onPressed() async {
     final db = FirebaseFirestore.instance;
-    final docRef = db.collection('users').doc('hogehoge');
-    await docRef.delete();
+    final collectionRef = db.collection('App_Data');
+    final collection = await collectionRef.get();
+    final docs = collection.docs;
+    if (docs.isNotEmpty) {
+      setState(() {
+        for (var doc in docs) {
+          datas.add(doc.data());
+        }
+      });
+    }
   }
 }

@@ -1,21 +1,24 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:kenkyuu04/components/auth_modal/components/submit_button.dart';
 
 import 'auth_text_form_field.dart';
 
-class registtration extends StatefulWidget {
-  const registtration({
+class RegisttrationForm extends StatefulWidget {
+  const RegisttrationForm({
     super.key,
   });
 
   @override
-  State<registtration> createState() => _registtrationState();
+  State<RegisttrationForm> createState() => _RegisttrationFormState();
 }
 
-class _registtrationState extends State<registtration> {
+class _RegisttrationFormState extends State<RegisttrationForm> {
   final TextEditingController _latitudeController = TextEditingController();
   final TextEditingController _longitudeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  String errorMessage = '';
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -26,7 +29,7 @@ class _registtrationState extends State<registtration> {
 
   // ---------  Validation ---------
 
-  String? validateEmail(String? value) {
+  /*String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter some text';
     }
@@ -38,7 +41,10 @@ class _registtrationState extends State<registtration> {
       return 'Please enter some text';
     }
     return null;
-  }
+  }*/
+
+
+
 
 
   @override
@@ -58,14 +64,13 @@ class _registtrationState extends State<registtration> {
           const SizedBox(height: 16.0),
           AuthTextFormField(
             controller: _latitudeController,
-            validator: validateEmail,
+            //validator: validateEmail,
             labelText: '緯度',
           ),
           const SizedBox(height: 16.0),
           AuthTextFormField(
             controller: _longitudeController,
-            obscureText: true,
-            validator: validatePassword,
+            //validator: validatePassword,
             labelText: '経度',
           ),
           const SizedBox(height: 16.0),
@@ -79,6 +84,34 @@ class _registtrationState extends State<registtration> {
   }
 
   Future<void> _submit(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {}
+    if (_formKey.currentState!.validate()) {
+      /*// サインアップ処理
+      final UserCredential? user = await registtration(
+        latitude: _latitudeController.text,
+        longitude: _longitudeController.text,
+      );*/
+
+      // 500ミリ秒待って、モーダルを閉じる
+      await createPosition(
+        latitude: _latitudeController.text,
+        longitude: _longitudeController.text,
+      );
+      if (!mounted) return;
+      Future.delayed(
+        const Duration(milliseconds: 500),
+        Navigator.of(context).pop,
+      );
+    }
+  }
+  Future<void> createPosition({
+    required String latitude,
+    required String longitude,
+  }) async {
+    await FirebaseFirestore.instance.collection('data').doc().set({
+      'latitude': latitude,
+      'longitude': longitude,
+      'dust': true,
+      'vending': true,
+    });
   }
 }

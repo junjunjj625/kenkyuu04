@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:kenkyuu04/components/auth_modal/components/submit_button.dart';
 
 import 'auth_text_form_field.dart';
@@ -17,6 +18,7 @@ class _searchState extends State<search> {
   final TextEditingController _latitudeController = TextEditingController();
   final TextEditingController _longitudeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
 
   @override
   void dispose() {
