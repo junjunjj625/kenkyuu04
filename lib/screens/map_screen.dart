@@ -1,10 +1,35 @@
 import 'dart:async';
+import 'dart:ffi';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../components/auth_modal/auth_modal.dart';
 
+class Data {
+  Data({
+    this.latitude = '',
+    this.longitude = '',
+    required this.dust,
+    required this.vending,
+    required this.id,
+  });
+
+  final String? latitude;
+  final String longitude;
+  final bool dust;
+  final bool vending;
+  final String id;
+
+  factory Data.fromDoc(String id, Map<String, dynamic> doc) => Data(
+    latitude: doc['latitude'],
+    longitude: doc['longitude'],
+    dust: doc['dust'],
+    vending: doc['vending'],
+    id: id,
+  );
+}
 
 class MapScreen extends StatefulWidget {
   const MapScreen({
@@ -32,11 +57,30 @@ class _MapScreenState extends State<MapScreen> {
     distanceFilter: 0,
   );
 
+  // ------------  Users  ------------
+  late StreamSubscription<List<Data>> dataStream;
+
+  // ------------  Methods for Markers  ------------
+  void _watchUsers() {
+    dataStream = getDataStream().listen((datas) {
+      _setDataMarkers(datas);
+    });
+  }
+
+  @override
+  void initState() {
+    //_watchSignInState();
+    // 他ユーザーのデータを監視
+    _watchUsers();
+    super.initState();
+  }
+
   @override
   void dispose() {
     mapController.dispose();
     // Streamを閉じる
     positionStream.cancel();
+    dataStream.cancel();
     super.dispose();
   }
 
@@ -132,10 +176,72 @@ class _MapScreenState extends State<MapScreen> {
             CameraUpdate.newCameraPosition(
               CameraPosition(
                 target: LatLng(position.latitude, position.longitude),
-                zoom: 16,
+                zoom: 16
               ),
             ),
           );
         });
+  }
+
+
+
+  Stream<List<Data>> getDataStream() {
+    return FirebaseFirestore.instance.collection('data').snapshots().map(
+          (snp) => snp.docs
+          .map((doc) => Data.fromDoc(doc.id, doc.data()))
+          .toList(),
+    );
+  }
+  void _setDataMarkers(List<Data> datas) {
+    // サインインしていなければ後続処理を行わない
+    /*if (!isSignedIn) {
+      return;
+    }*/
+    //
+    final dvs = datas.where((data) => data.vending == true || data.dust == true).toList();
+
+    // ユーザーのマーカーをセット
+    for (final dv in dvs) {
+        final String lat = dv.latitude!;
+        final String lng = dv.longitude!;
+        setState(() {
+          // 既にマーカーが作成されている場合は、取り除く
+          if (markers
+              .where((m) => m.markerId == MarkerId(dv.id!))
+              .isNotEmpty) {
+            markers.removeWhere(
+                  (marker) => marker.markerId == MarkerId(dv.id!),
+            );
+          }
+          // 取り除いた上でマーカーを追加
+          if(dv.vending == true){
+            markers.add(Marker(
+              markerId: MarkerId(dv.id!),
+              position: LatLng(double.parse(lat), double.parse(lng)),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueYellow,
+              ),
+            ));
+          }
+          if(dv.dust == true){
+            markers.add(Marker(
+              markerId: MarkerId(dv.id!),
+              position: LatLng(double.parse(lat), double.parse(lng)),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueGreen,
+              ),
+            ));
+          }
+          if(dv.dust == true && dv.vending == true){
+            markers.add(Marker(
+              markerId: MarkerId(dv.id!),
+              position: LatLng(double.parse(lat), double.parse(lng)),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueBlue,
+              ),
+            ));
+          }
+        });
+      }
   }
 }
