@@ -51,11 +51,15 @@ class _MapScreenState extends State<MapScreen> {
     zoom: 16.0,
   );
 
+  late Position currentPosition;
+
+
   // 現在地通知の設定
   final LocationSettings locationSettings = const LocationSettings(
     accuracy: LocationAccuracy.high, //正確性:highはAndroid(0-100m),iOS(10m)
     distanceFilter: 0,
   );
+
 
   // ------------  Users  ------------
   late StreamSubscription<List<Data>> dataStream;
@@ -109,7 +113,7 @@ class _MapScreenState extends State<MapScreen> {
                 borderRadius: BorderRadius.circular(16.0),
               ),
               builder: (BuildContext context) {
-                return const AuthModal();
+                return AuthModal(currentPosition);
               });
         },
         label: const Text('メニュー'),
@@ -153,6 +157,7 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+
   void _watchCurrentLocation() {
     // 現在地を監視
     positionStream =
@@ -162,6 +167,8 @@ class _MapScreenState extends State<MapScreen> {
           setState(() {
             markers.removeWhere(
                     (marker) => marker.markerId == const MarkerId('current_location'));
+
+            currentPosition = position;
 
             markers.add(Marker(
               markerId: const MarkerId('current_location'),
@@ -176,7 +183,7 @@ class _MapScreenState extends State<MapScreen> {
             CameraUpdate.newCameraPosition(
               CameraPosition(
                 target: LatLng(position.latitude, position.longitude),
-                zoom: 16
+                zoom: 16,
               ),
             ),
           );
@@ -200,7 +207,6 @@ class _MapScreenState extends State<MapScreen> {
     //
     final dvs = datas.where((data) => data.vending == true || data.dust == true).toList();
 
-    // ユーザーのマーカーをセット
     for (final dv in dvs) {
         final String lat = dv.latitude!;
         final String lng = dv.longitude!;

@@ -1,17 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:kenkyuu04/components/auth_modal/components/submit_button.dart';
 
 import 'auth_text_form_field.dart';
 
 class RegisttrationForm extends StatefulWidget {
-  const RegisttrationForm({
+  late Position position;
+  RegisttrationForm(currentPosition, {
     super.key,
-  });
+  }){
+    position = currentPosition;
+  }
 
   @override
-  State<RegisttrationForm> createState() => _RegisttrationFormState();
+  State<RegisttrationForm> createState() => _RegisttrationFormState(position);
 }
 class _RegisttrationFormState extends State<RegisttrationForm> {
   final TextEditingController _latitudeController = TextEditingController();
@@ -22,6 +26,11 @@ class _RegisttrationFormState extends State<RegisttrationForm> {
 
   bool _flagv = false;
   bool _flagd = false;
+
+  late Position position;
+  _RegisttrationFormState(currentPosition){
+    position = currentPosition;
+  }
 
   void _vending(bool? e) {
     setState(() {
@@ -43,7 +52,8 @@ class _RegisttrationFormState extends State<RegisttrationForm> {
   }
   @override
   Widget build(BuildContext context) {
-    //_latitudeController.text = position.latitude;
+    _latitudeController.text = position.latitude.toString();
+    _longitudeController.text = position.longitude.toString();
     return Form(
       key: _formKey,
       child: Column(
@@ -59,17 +69,14 @@ class _RegisttrationFormState extends State<RegisttrationForm> {
           const SizedBox(height: 16.0),
           AuthTextFormField(
             controller: _latitudeController,
-            //validator: validateEmail,
-            labelText: '緯度',
+            labelText: position.latitude.toString(),
           ),
           const SizedBox(height: 16.0),
           AuthTextFormField(
             controller: _longitudeController,
-            //validator: validatePassword,
-            labelText: '経度',
+            labelText: position.longitude.toString(),
           ),
           Center(
-            //child: Text(_flagv.toString()),
             child: Text('自動販売機'),
           ),
           Checkbox(
@@ -79,7 +86,6 @@ class _RegisttrationFormState extends State<RegisttrationForm> {
             onChanged: _dust,
           ),
           Center(
-            //child: Text(_flagd.toString()),
             child: Text('ゴミ箱'),
           ),
           Checkbox(
@@ -101,14 +107,9 @@ class _RegisttrationFormState extends State<RegisttrationForm> {
 
   Future<void> _submit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      /*// サインアップ処理
-      final UserCredential? user = await registtration(
-        latitude: _latitudeController.text,
-        longitude: _longitudeController.text,
-      );*/
-
       // 500ミリ秒待って、モーダルを閉じる
       await createPosition(
+
         latitude: _latitudeController.text,
         longitude: _longitudeController.text,
         vending: _flagv,

@@ -1,3 +1,4 @@
+import 'package:geolocator_platform_interface/src/models/position.dart';
 import 'package:kenkyuu04/components/auth_modal/components/close_modal_button.dart';
 import 'package:flutter/material.dart';
 
@@ -10,15 +11,25 @@ enum AuthModalType {
 }
 
 class AuthModal extends StatefulWidget {
-  const AuthModal({super.key});
+  late Position position;
+
+  AuthModal(Position currentPosition, {super.key}){
+    position = currentPosition;
+  }
 
   @override
-  State<AuthModal> createState() => _AuthModalState();
+  State<AuthModal> createState() => _AuthModalState(position);
 }
 
 class _AuthModalState extends State<AuthModal> {
   AuthModalType modalType = AuthModalType.search;
   String buttonLabel = '検索へ';
+
+  late Position position;
+
+  _AuthModalState(Position currentPosition){
+    position = currentPosition;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +45,7 @@ class _AuthModalState extends State<AuthModal> {
           modalType == AuthModalType.search
               //? const Text('検索')
               //: const Text('登録'),
-              ? const RegisttrationForm()
+              ? RegisttrationForm(position)
               : const search(),
           TextButton(
             onPressed: switchModalType,
