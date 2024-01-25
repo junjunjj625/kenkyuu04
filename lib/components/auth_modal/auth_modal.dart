@@ -23,7 +23,6 @@ class AuthModal extends StatefulWidget {
 
 class _AuthModalState extends State<AuthModal> {
   AuthModalType modalType = AuthModalType.search;
-  String buttonLabel = '検索へ';
 
   late Position position;
 
@@ -43,14 +42,8 @@ class _AuthModalState extends State<AuthModal> {
         children: [
           const CloseModalButton(),
           modalType == AuthModalType.search
-              //? const Text('検索')
-              //: const Text('登録'),
               ? RegisttrationForm(position)
               : const search(),
-          TextButton(
-            onPressed: switchModalType,
-            child: Text(buttonLabel),
-          ),
           const SizedBox(height: 300)
         ],
       ),
@@ -70,8 +63,6 @@ class _AuthModalState extends State<AuthModal> {
       modalType = modalType == AuthModalType.search
           ? AuthModalType.registration
           : AuthModalType.search;
-
-      buttonLabel = modalType == AuthModalType.search ? '検索へ' : '登録へ';
     });
   }
 }

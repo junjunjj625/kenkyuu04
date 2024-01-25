@@ -23,7 +23,6 @@ class _RegisttrationFormState extends State<RegisttrationForm> {
   final _formKey = GlobalKey<FormState>();
   String errorMessage = '';
   bool isLoading = false;
-
   bool _flagv = false;
   bool _flagd = false;
 

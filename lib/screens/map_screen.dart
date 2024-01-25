@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -56,7 +54,7 @@ class _MapScreenState extends State<MapScreen> {
 
   // 現在地通知の設定
   final LocationSettings locationSettings = const LocationSettings(
-    accuracy: LocationAccuracy.high, //正確性:highはAndroid(0-100m),iOS(10m)
+    accuracy: LocationAccuracy.high,
     distanceFilter: 0,
   );
 
@@ -73,8 +71,6 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   void initState() {
-    //_watchSignInState();
-    // 他ユーザーのデータを監視
     _watchUsers();
     super.initState();
   }
@@ -116,7 +112,7 @@ class _MapScreenState extends State<MapScreen> {
                 return AuthModal(currentPosition);
               });
         },
-        label: const Text('メニュー'),
+        label: const Text('登録'),
       ),
     );
   }
@@ -200,11 +196,6 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
   void _setDataMarkers(List<Data> datas) {
-    // サインインしていなければ後続処理を行わない
-    /*if (!isSignedIn) {
-      return;
-    }*/
-    //
     final dvs = datas.where((data) => data.vending == true || data.dust == true).toList();
 
     for (final dv in dvs) {
